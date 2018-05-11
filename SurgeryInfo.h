@@ -11,6 +11,8 @@ public:
 	std::string getSubSpecialty() const;
 	int getTime() const;
 
+	
+
 
 private:
 	int ID;

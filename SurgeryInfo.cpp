@@ -1,10 +1,11 @@
 #include "SurgeryInfo.h"
+#include <sstream>
 
 SurgeryInfo::SurgeryInfo(int ID, const std::string & subSpecialty, int time)
 {
 	this->ID = ID;
 	this->subSpecialty = subSpecialty;
-	this->time;
+	this->time = time;
 }
 
 SurgeryInfo::~SurgeryInfo()
@@ -26,3 +27,6 @@ int SurgeryInfo::getTime() const
 {
 	return time;
 }
+
+
+

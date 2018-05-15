@@ -1,12 +1,14 @@
 #include "OperatingRoom.h"
 #include <iostream>
+#include <queue>
+#include <functional>
 
-OperatingRoom::OperatingRoom(int nrOfOperatingRooms, float startTime, float endTime)
+OperatingRoom::OperatingRoom(float startTime, float endTime)
 {
-	this->nrOfOperatingRooms = nrOfOperatingRooms;
-	this->OperatingRooms = new List<SurgeryInfo>[nrOfOperatingRooms];
+	
 	this->startTime = startTime;
 	this->endTime = endTime;
+	this->TimeLeft = (this->endTime - this->startTime) * 60;;
 	
 
 }
@@ -29,27 +31,66 @@ void OperatingRoom::setTimeForOR(float newStartTime, float newEndTime)
 	this->startTime = newStartTime;
 	this->endTime = newEndTime;
 }
-void OperatingRoom::AddSurgeriesToList(int ID, std::string subSpecialty, int time)
+void OperatingRoom::AddSurgeriesToOR( int ID, std::string subSpecialty, int time)
 {
 	SurgeryInfo toAdd(ID, subSpecialty, time);
-	OperatingRooms[0].insertAt(0, toAdd);
+	ORoom.insertAt(0, toAdd);
 
 }
-void OperatingRoom::PrintSchedule() const
+void OperatingRoom::PrintSchedule() 
 {
-	for (int i = 0; i < nrOfOperatingRooms; i++)
-	{
-		int length = OperatingRooms[i].length();
+	int length = ORoom.length();
 		if (length != 0)
 		{
+			SurgeryInfo * GetAll = new SurgeryInfo[length];
+			ORoom.getAll(GetAll, length); 
+			for (int i = 0; i < length; i++)
 			{
-				for (int k = 0; k < length; k++)
-				{
-					std::cout << "ID: " << OperatingRooms[i].getAt(k).getID() << "  Surgery: " << OperatingRooms[i].getAt(k).getSubSpecialty() << " Time: " << OperatingRooms[i].getAt(k).getTime() << std::endl;
-				}
+				std::cout << GetAll[i].getID() << " " << GetAll[i].getSubSpecialty() << " " << GetAll[i].getTime() << std::endl;
 			}
-
 			std::cout << "" << std::endl;
 		}
+	
+}
+
+OperatingRoom::helpStruct OperatingRoom::BinPacking(List<SurgeryInfo> &aList, int &time) const
+{
+	std::priority_queue<helpStruct> PQ;
+	int listLength = aList.length();
+	for (int i = 0; i < listLength; i++)
+	{
+		
+		helpStruct addToPQ = { aList.getAt(i).getID(), aList.getAt(i).getSubSpecialty(), aList.getAt(i).getTime() };
+		PQ.push(addToPQ);
+
 	}
+
+
+	helpStruct highest = PQ.top();
+	 
+//	std::cout <<"\n"<< highest.ID << " " << highest.subSpecialty << " " << highest.time << std::endl;
+	PQ.pop(); 
+	highest.ID, highest.subSpecialty, highest.time;
+	//std::cout << "\n" << highest.ID << " " << highest.subSpecialty << " " << highest.time << std::endl;
+
+
+	return highest;
+
+}
+
+int OperatingRoom::getTotalTime() const
+{
+	return this->TimeLeft; 
+}
+
+void OperatingRoom::countTime(const int time)
+{
+	TimeLeft = TimeLeft - time;
+}
+
+void OperatingRoom::setTime(float start, float end)
+{
+	this->startTime = start;
+	this->endTime = end;
+	this->TimeLeft = (end - start) * 60;
 }

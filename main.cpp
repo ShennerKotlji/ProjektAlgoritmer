@@ -4,6 +4,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <ctime>
+#include <time.h>
+#include <stack>
 
 using namespace std;
 
@@ -15,17 +18,23 @@ struct helpStruct
 
 	bool operator<(const helpStruct& other) const
 	{
-		return time > other.time;
+		return time < other.time;
 	}
 };
-void BinPacking(List<SurgeryInfo> aList, std::priority_queue<helpStruct> &PQ);
+void BinPacking(List<SurgeryInfo> aList, std::priority_queue<helpStruct> &PQ, std::stack<helpStruct> &Q);
 void readFromFile(List<SurgeryInfo> &aList, const std::string & fileName);
 void Uppgift1(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<helpStruct> &PQ);
+void Uppgift1del2(OperatingRoom *&roomArr, int amountOfORs, std::stack<helpStruct> &Q);
+
 
 int main()
 
 {
 	std::priority_queue<helpStruct> PQ;
+	std::stack<helpStruct> Q;
+
+	clock_t start;
+	clock_t end;
 
 	std::cout << "Enter amount of operating rooms" << endl;
 	int amountOfORs = 0;
@@ -35,9 +44,14 @@ int main()
 	OperatingRoom * roomArr = nullptr;
 	readFromFile(aList, "Operationer_1a.txt");
 	readFromFile(aList, "Operationer_1b.txt");
-	BinPacking(aList, PQ);
+	
+	BinPacking(aList, PQ,Q);
+	start = clock();
 	Uppgift1(roomArr, amountOfORs, PQ);
-
+	//Uppgift1del2(roomArr, amountOfORs, Q); 
+	end = clock();
+	float time = 1.0f*(end - start);/*/CLOCKS_PER_SEC;*/
+	std::cout << time << endl;
 	std::cin.get();
 	return 0;
 
@@ -79,14 +93,15 @@ void readFromFile(List<SurgeryInfo> &aList, const std::string & fileName)
 	delete[] GetAll;*/
 }
 
-
-void Uppgift1(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<helpStruct> &PQ)
+void Uppgift1del2(OperatingRoom *&roomArr, int amountOfORs,  std::stack<helpStruct> &Q)
 {
-	helpStruct highest = PQ.top();
+	
+	helpStruct highest = Q.top();
+	
 	roomArr = new OperatingRoom[amountOfORs];
 	int time = 0;
-	//UPPGIFT 1
 
+	//UPPGIFT 1
 	for (int i = 0; i < amountOfORs; i++)
 	{
 		roomArr[i].setTime(08.00, 19.00);
@@ -94,7 +109,67 @@ void Uppgift1(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<help
 
 	bool addedToOR = false;
 	bool keepRunning = false;
-	int count = 0; 
+	int totlaTimeForall = roomArr[0].getTotalTime();
+	while (keepRunning == false)
+	{
+		addedToOR = false;
+		highest = Q.top();
+		for (int i = 0; i < amountOfORs; i++)
+		{
+			if (roomArr[i].getTotalTime() >= highest.time)
+			{
+				roomArr[i].AddSurgeriesToOR(highest.ID, highest.subSpecialty, highest.time);
+				roomArr[i].countTime(highest.time);
+				Q.pop();
+		
+				highest = Q.top();
+				i--;
+				addedToOR = true;
+			}
+
+			if (addedToOR == false && Q.size() != 0)
+			{
+				Q.pop();
+
+			}
+
+			else if (Q.size() == 0)
+			{
+				keepRunning = true;
+			}
+	
+		}
+	}
+
+
+	for (int i = 0; i < amountOfORs; i++)
+	{
+		cout << i << " " << endl;
+		roomArr[i].PrintSchedule();
+	}
+}
+void Uppgift1(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<helpStruct> &PQ)
+{
+	/*bool *Arr = new bool[amountOfORs]; 
+	for (int i = 0; i < amountOfORs; i++)
+	{
+		Arr[i] = false; 
+	}*/
+
+	helpStruct highest = PQ.top();
+	roomArr = new OperatingRoom[amountOfORs];
+	int time = 0;
+
+	//UPPGIFT 1
+	for (int i = 0; i < amountOfORs; i++)
+	{
+		roomArr[i].setTime(08.00, 19.00);
+	}
+
+	bool addedToOR = false;
+	bool keepRunning = false; 
+	int totlaTimeForall = roomArr[0].getTotalTime();
+
 
 	while(keepRunning == false)
 	{
@@ -110,32 +185,30 @@ void Uppgift1(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<help
 				highest = PQ.top();
 				i--;
 				addedToOR = true;
-
 			}
-
-			bool fullCapacity = false;
-			for (int k = 0; i < amountOfORs; i++)
-			{
-				if(roomArr[i].getTotalTime())
-			}
-				
-			
 
 			if (addedToOR == false && PQ.size() != 0)
 			{
 				PQ.pop();
-			
+				
 			}
 
 			else if(PQ.size() == 0)
 			{
 				keepRunning = true;
 			}
+		/*	if (roomArr[i].getTotalTime() == totlaTimeForall)
+			{
+				Arr[i] = true; 
+			}*/
 		}
-
-
+		
 		
 	}
+
+	
+
+
 
 	for (int i = 0; i < amountOfORs; i++)
 	{
@@ -150,17 +223,20 @@ void Uppgift1(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<help
 }
 
 
-void BinPacking(List<SurgeryInfo> aList, std::priority_queue<helpStruct> &PQ)
+void BinPacking(List<SurgeryInfo> aList, std::priority_queue<helpStruct> &PQ, std::stack<helpStruct> &Q)
 {
 	int listLength = aList.length();
 	for (int i = 0; i < listLength; i++)
 	{
 
 		helpStruct addToPQ = { aList.getAt(i).getID(), aList.getAt(i).getSubSpecialty(), aList.getAt(i).getTime() };
+		Q.push(addToPQ);
 		PQ.push(addToPQ);
 
 	}
-	helpStruct highest = PQ.top();
+	/*helpStruct highest = PQ.top();*/
+	// topInQueue = Q.front();
+	
 
-	std::cout << highest.time << endl;
+	//std::cout << highest.time << endl;
 }

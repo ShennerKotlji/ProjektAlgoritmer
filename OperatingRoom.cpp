@@ -49,8 +49,10 @@ void OperatingRoom::PrintSchedule()
 				std::cout << GetAll[i].getID() << " " << GetAll[i].getSubSpecialty() << " " << GetAll[i].getTime() << std::endl;
 			}
 			std::cout << "" << std::endl;
+			delete[] GetAll;
 		}
 	
+		
 }
 
 OperatingRoom::helpStruct OperatingRoom::BinPacking(List<SurgeryInfo> &aList, int &time) const
@@ -88,7 +90,7 @@ void OperatingRoom::countTime(const int time)
 	TimeLeft = TimeLeft - time;
 }
 
-void OperatingRoom::setTime(float start, float end)
+void OperatingRoom::setTime(const float start, const float end)
 {
 	this->startTime = start;
 	this->endTime = end;

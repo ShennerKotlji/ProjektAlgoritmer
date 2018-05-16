@@ -31,20 +31,19 @@ public:
 	void setTimeForOR(float newStartTime, float newEndTime);
 	void AddSurgeriesToOR(int ID, std::string subSpecialty, int time);
 	int getTotalTime() const; 
-	void setTime(float start, float end); 
+	void setTime(const float start, const float end); 
 	
 	void countTime(const int time);
 	struct helpStruct BinPacking(List<SurgeryInfo>& aList, int &time) const;
-	void PrintSchedule() ;
+	void PrintSchedule();
 
 
 
 private:
 	List<SurgeryInfo> ORoom;
-	//int nrOfOperatingRooms;
-	float startTime;
+	float startTime;//
 	float endTime; 
-	int TimeLeft;
+	float TimeLeft;
 	struct helpStruct;
 
 	/*struct helpStruct

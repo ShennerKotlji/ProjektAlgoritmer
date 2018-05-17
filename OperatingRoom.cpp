@@ -46,7 +46,7 @@ void OperatingRoom::PrintSchedule()
 			ORoom.getAll(GetAll, length); 
 			for (int i = 0; i < length; i++)
 			{
-				std::cout << GetAll[i].getID() << " " << GetAll[i].getSubSpecialty() << " " << GetAll[i].getTime() << std::endl;
+				std::cout << "ID: " << GetAll[i].getID() << " " << "Surgery : " << GetAll[i].getSubSpecialty() << " Time :" <<  GetAll[i].getTime() << std::endl;
 			}
 			std::cout << "" << std::endl;
 			delete[] GetAll;

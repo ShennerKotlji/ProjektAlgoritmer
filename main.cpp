@@ -24,9 +24,11 @@ struct helpStruct
 void AddToPQ(List<SurgeryInfo> aList, std::priority_queue<helpStruct> &PQ, std::stack<helpStruct> &Q);
 void readFromFile(List<SurgeryInfo> &aList, const std::string & fileName);
 void Uppgift1(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<helpStruct> &PQ, List<SurgeryInfo> &SurgeriesNotScheduled);
-void Uppgift1del2(OperatingRoom *&roomArr, int amountOfORs, std::stack<helpStruct> &Q, List<SurgeryInfo> &SurgeriesNotScheduled);
-void Uppgift2(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<helpStruct> &PQ, List<SurgeryInfo> &SurgeriesNotScheduled, bool k);
-void resetArr(OperatingRoom*&roomArr,  int amountOfORs);
+void Uppgift1Stack(OperatingRoom *&roomArr, int amountOfORs, std::stack<helpStruct> &Q, List<SurgeryInfo> &SurgeriesNotScheduled);
+void Uppgift2(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<helpStruct> &PQ, List<SurgeryInfo> &SurgeriesNotScheduled, int day);
+void Uppgift2Stack(OperatingRoom *&roomArr, int amountOfORs, std::stack<helpStruct> &Q, List<SurgeryInfo> &SurgeriesNotScheduled, int day);
+void PrintNotScheduled(List<SurgeryInfo> SurgeriesNotScheduled);
+
 
 
 int main()
@@ -54,7 +56,7 @@ int main()
 	//AddToPQ(aList, PQ,Q);
 	//start = clock();
 	//Uppgift1(roomArr, amountOfORs, PQ,  SurgeriesNotScheduled);
-	////Uppgift1del2(roomArr, amountOfORs, Q, SurgeriesNotScheduled);
+	////Uppgift1Stack(roomArr, amountOfORs, Q, SurgeriesNotScheduled);
 	//end = clock();
 	////TIME
 	//float time = 1.0f*(end - start)/CLOCKS_PER_SEC;
@@ -73,43 +75,55 @@ int main()
 	//std::cin.get();
 
 
-	//UPPGIFT 2
-	readFromFile(aList,"Operationer_2.txt");
-	cout << "\nFor how many days do you want to book the OR?" << endl; 
-	int Days; 
-	cin >> Days; 
-	cin.ignore(); 
+	////UPPGIFT 2 MED PQ - MAX OCH MIN HEAP
+	//readFromFile(aList,"Operationer_2.txt");
+	//cout << "\nFor how many days do you want to book the OR?" << endl; 
+	//int Days; 
+	//cin >> Days; 
+	//cin.ignore(); 
 
-	bool k = true; 
+	//AddToPQ(aList, PQ, Q);
+	//Uppgift2(roomArr, amountOfORs, PQ, SurgeriesNotScheduled,k,1);
+	//for (int i = 0; i < Days - 1; i++)
+	//{
+	//	AddToPQ(SurgeriesNotScheduled, PQ, Q);
+	//	for (int g = 0; g < SurgeriesNotScheduled.length(); g++)
+	//	{
+	//		SurgeriesNotScheduled.removeAt(g);
+	//		g--;
+	//	}
+	//	Uppgift2(roomArr, amountOfORs, PQ, SurgeriesNotScheduled, k,i+1);
+	//}
+	//	
+	//PrintNotScheduled(SurgeriesNotScheduled);
+
+
+
+	//UPPGIFT 2 med STACK
+	readFromFile(aList, "Operationer_2.txt");
+	cout << "\nFor how many days do you want to book the OR?" << endl;
+	int Days;
+	cin >> Days;
+	cin.ignore();
+
 	AddToPQ(aList, PQ, Q);
-		cout << "Day: 1" << endl;
-		Uppgift2(roomArr, amountOfORs, PQ, SurgeriesNotScheduled,k);
-		AddToPQ(SurgeriesNotScheduled, PQ, Q);
-		
-		for (int i = 0; i < SurgeriesNotScheduled.length(); i++)
-		{
-			SurgeriesNotScheduled.removeAt(i);
-			i--;
-		}
-	
-
-		cout << "Day: 2" << endl;
-		//OperatingRoom* newArr = nullptr;
-		Uppgift2(roomArr, amountOfORs, PQ, SurgeriesNotScheduled,k);
-	
-
-	// NOT SCHEDULED SURGERIES
-	int length = SurgeriesNotScheduled.length();
-	SurgeryInfo* GetSurgeries = new SurgeryInfo[length];
-	SurgeriesNotScheduled.getAll(GetSurgeries, length);
-	cout << "SURGERIES NOT SCHEDULED" << endl;
-	cout << length << endl;
-	for (int i = 0; i < length; i++)
+	Uppgift2Stack(roomArr, amountOfORs, Q, SurgeriesNotScheduled,1);
+	PrintNotScheduled(SurgeriesNotScheduled);
+	for (int i = 0; i < Days - 1; i++)
 	{
-		cout << GetSurgeries[i].getID() << " " << GetSurgeries[i].getSubSpecialty() << " " << GetSurgeries[i].getTime() << endl;
+		AddToPQ(SurgeriesNotScheduled, PQ, Q);
+		for (int g = 0; g < SurgeriesNotScheduled.length(); g++)
+		{
+			SurgeriesNotScheduled.removeAt(g);
+			g--;
+		}
+		Uppgift2Stack(roomArr, amountOfORs, Q, SurgeriesNotScheduled, i + 1);
+		PrintNotScheduled(SurgeriesNotScheduled);
 	}
 
-	delete[] GetSurgeries;
+	
+
+
 	cin.get();
 	return 0;
 
@@ -117,7 +131,6 @@ int main()
 
 void readFromFile(List<SurgeryInfo> &aList, const std::string & fileName)
 {
-
 	ifstream fileIn(fileName);
 	if (fileIn.is_open())
 	{
@@ -137,21 +150,11 @@ void readFromFile(List<SurgeryInfo> &aList, const std::string & fileName)
 			SurgeryInfo toAdd(ID, subSpecialty, time);
 			aList.insertAt(0, toAdd);
 		}
-
 	}
 
-	/*int length = aList.length();
-	SurgeryInfo*GetAll = new SurgeryInfo[length];
-	aList.getAll(GetAll, length);
-	for (int i = 0; i < length; i++)
-	{
-		cout << GetAll[i].getID()  <<  " " <<  GetAll[i].getSubSpecialty() << " " << GetAll[i].getTime() << endl;
-	}
-
-	delete[] GetAll;*/
 }
 
-void Uppgift1del2(OperatingRoom *&roomArr, int amountOfORs,  std::stack<helpStruct> &Q, List<SurgeryInfo>& SurgeriesNotScheduled)
+void Uppgift1Stack(OperatingRoom *&roomArr, int amountOfORs,  std::stack<helpStruct> &Q, List<SurgeryInfo>& SurgeriesNotScheduled)
 {
 	
 	helpStruct highest = Q.top();
@@ -179,9 +182,17 @@ void Uppgift1del2(OperatingRoom *&roomArr, int amountOfORs,  std::stack<helpStru
 				roomArr[i].countTime(highest.time);
 				Q.pop();
 
-				highest = Q.top();
-				i--;
-				addedToOR = true;
+				if (Q.size() == 0)
+				{
+					i = amountOfORs;
+					keepRunning = true;
+				}
+				else
+				{
+					highest = Q.top();
+					i--;
+					addedToOR = true;
+				}
 			}
 
 		}
@@ -252,9 +263,17 @@ void Uppgift1(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<help
 				roomArr[i].AddSurgeriesToOR(highest.ID, highest.subSpecialty, highest.time);
 				roomArr[i].countTime(highest.time);
 				PQ.pop();
-				highest = PQ.top();
-				i--;
-				addedToOR = true;
+				if (PQ.size() == 0)
+				{
+					i = amountOfORs;
+					keepRunning = true;
+				}
+				else
+				{
+					highest = PQ.top();
+					i--;
+					addedToOR = true;
+				}
 			}
 
 		}
@@ -270,31 +289,9 @@ void Uppgift1(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<help
 			{
 				keepRunning = true;
 			}
-
-		
-		/*for (int i = 0; i < amountOfORs; i++)
-		{
-			if (roomArr[i].getTotalTime() == 0)
-			{
-				countFilled++;
-			}
-		}
-
-		if (countFilled == amountOfORs)
-		{
-			keepRunning = true;
-		}*/
 	
 	}
 
-	/*for (int i = 0; i < amountOfORs; i++)
-	{
-		cout << i << " " << endl;
-		roomArr[i].PrintSchedule();
-	}*/
-	
-		/*highest = PQ.top();
-		cout << highest.time;*/
 	delete[] roomArr;
 	
 }
@@ -317,15 +314,14 @@ void AddToPQ(List<SurgeryInfo> aList, std::priority_queue<helpStruct> &PQ, std::
 	//std::cout << highest.time << endl;
 }
 
-void Uppgift2(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<helpStruct> &PQ, List<SurgeryInfo> &SurgeriesNotScheduled, bool k)
+void Uppgift2(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<helpStruct> &PQ, List<SurgeryInfo> &SurgeriesNotScheduled, int day)
 {
 	roomArr = new OperatingRoom[amountOfORs];
 	helpStruct highest = PQ.top();
 	int time = 0;
-	if(k == true)
+	
+	for (int i = 0; i < amountOfORs; i++)
 	{
-		for (int i = 0; i < amountOfORs; i++)
-		{
 		float start = 0;
 		float end = 0;
 		cout << "\nEnter the start time for Operation room " << i + 1 << endl;
@@ -335,10 +331,8 @@ void Uppgift2(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<help
 		cin >> end;
 		cin.ignore();
 		roomArr[i].setTime(start, end);
-		}
 	}
-
-
+	
 	bool addedToOR = false;
 	bool keepRunning = false;
 	int countFilled = 0;
@@ -355,9 +349,19 @@ void Uppgift2(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<help
 				roomArr[i].AddSurgeriesToOR(highest.ID, highest.subSpecialty, highest.time);
 				roomArr[i].countTime(highest.time);
 				PQ.pop();
-				highest = PQ.top();
-				i--;
-				addedToOR = true;
+
+				if (PQ.size() == 0)
+				{
+					i = amountOfORs;
+					keepRunning = true;
+				}
+				else
+				{
+					highest = PQ.top();
+					i--;
+					addedToOR = true;
+				}
+				
 			}
 
 		}
@@ -375,16 +379,112 @@ void Uppgift2(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<help
 
 	}
 
+	cout << "DAY: " << day << endl;
 	for (int i = 0; i < amountOfORs; i++)
 	{
-	cout << i << " " << endl;
-	roomArr[i].PrintSchedule();
+		cout << "Operating Room " << i+1 << endl;
+		roomArr[i].PrintSchedule();
 	}
 
 	delete[] roomArr;
 
 }
-void resetArr(OperatingRoom*&roomArr, int amountOfORs)
-{
 
+void PrintNotScheduled(List<SurgeryInfo> SurgeriesNotScheduled)
+{
+	if (SurgeriesNotScheduled.length() != 0)
+	{
+		int length = SurgeriesNotScheduled.length();
+		SurgeryInfo* GetSurgeries = new SurgeryInfo[length];
+		SurgeriesNotScheduled.getAll(GetSurgeries, length);
+		cout << "SURGERIES NOT SCHEDULED" << endl;
+		cout << "Amount of surgeries " << length << endl;
+		for (int i = 0; i < length; i++)
+		{
+			cout << GetSurgeries[i].getID() << " " << GetSurgeries[i].getSubSpecialty() << " " << GetSurgeries[i].getTime() << endl;
+		}
+
+		delete[] GetSurgeries;
+	}
+
+	else
+	{
+		cout << "All surgeries was succesfully booked to the available OR:s " << endl;
+	}
+
+}
+
+void Uppgift2Stack(OperatingRoom *&roomArr, int amountOfORs, std::stack<helpStruct> &Q, List<SurgeryInfo> &SurgeriesNotScheduled, int day)
+{
+	roomArr = new OperatingRoom[amountOfORs];
+	helpStruct highest = Q.top();
+	int time = 0;
+
+	for (int i = 0; i < amountOfORs; i++)
+	{
+		float start = 0;
+		float end = 0;
+		cout << "\nEnter the start time for Operation room " << i + 1 << endl;
+		cin >> start;
+		cin.ignore();
+		cout << "\nEnter the end time for Operation room " << i + 1 << endl;
+		cin >> end;
+		cin.ignore();
+		roomArr[i].setTime(start, end);
+	}
+
+	bool addedToOR = false;
+	bool keepRunning = false;
+	int countFilled = 0;
+
+	while (keepRunning == false)
+	{
+		highest = Q.top();
+		countFilled = 0;
+		addedToOR = false;
+		for (int i = 0; i < amountOfORs; i++)
+		{
+			if (roomArr[i].getTotalTime() >= highest.time)
+			{
+				roomArr[i].AddSurgeriesToOR(highest.ID, highest.subSpecialty, highest.time);
+				roomArr[i].countTime(highest.time);
+				Q.pop();
+
+				if (Q.size() == 0)
+				{
+					i = amountOfORs;
+					keepRunning = true;
+				}
+				else
+				{
+					highest = Q.top();
+					i--;
+					addedToOR = true;
+				}
+
+			}
+
+		}
+		if (addedToOR == false && Q.size() != 0)
+		{
+			SurgeryInfo add(highest.ID, highest.subSpecialty, highest.time);
+			SurgeriesNotScheduled.insertAt(0, add);
+			Q.pop();
+		}
+
+		if (Q.size() == 0)
+		{
+			keepRunning = true;
+		}
+
+	}
+
+	cout << "DAY: " << day << endl;
+	for (int i = 0; i < amountOfORs; i++)
+	{
+		cout << "Operating Room " << i + 1 << endl;
+		roomArr[i].PrintSchedule();
+	}
+
+	delete[] roomArr;
 }

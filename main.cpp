@@ -21,13 +21,16 @@ struct helpStruct
 		return time < other.time;
 	}
 };
+
 void AddToPQ(List<SurgeryInfo> aList, std::priority_queue<helpStruct> &PQ, std::stack<helpStruct> &Q);
 void readFromFile(List<SurgeryInfo> &aList, const std::string & fileName);
+void PrintNotScheduled(List<SurgeryInfo> SurgeriesNotScheduled);
+
 void Uppgift1(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<helpStruct> &PQ, List<SurgeryInfo> &SurgeriesNotScheduled);
 void Uppgift1Stack(OperatingRoom *&roomArr, int amountOfORs, std::stack<helpStruct> &Q, List<SurgeryInfo> &SurgeriesNotScheduled);
 void Uppgift2(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<helpStruct> &PQ, List<SurgeryInfo> &SurgeriesNotScheduled, int day);
 void Uppgift2Stack(OperatingRoom *&roomArr, int amountOfORs, std::stack<helpStruct> &Q, List<SurgeryInfo> &SurgeriesNotScheduled, int day);
-void PrintNotScheduled(List<SurgeryInfo> SurgeriesNotScheduled);
+
 
 
 
@@ -50,32 +53,24 @@ int main()
 	List<SurgeryInfo> SurgeriesNotScheduled;
 	OperatingRoom * roomArr = nullptr;
 
-	//Uppgift1
+	////Uppgift1
 	//readFromFile(aList, "Operationer_1a.txt");
 	//readFromFile(aList, "Operationer_1b.txt");
 	//AddToPQ(aList, PQ,Q);
 	//start = clock();
-	//Uppgift1(roomArr, amountOfORs, PQ,  SurgeriesNotScheduled);
-	////Uppgift1Stack(roomArr, amountOfORs, Q, SurgeriesNotScheduled);
+	////Uppgift1(roomArr, amountOfORs, PQ,  SurgeriesNotScheduled);
+	//Uppgift1Stack(roomArr, amountOfORs, Q, SurgeriesNotScheduled);
 	//end = clock();
 	////TIME
 	//float time = 1.0f*(end - start)/CLOCKS_PER_SEC;
 	//std::cout << time << endl;
 	//std::cout << "" << endl;
-	//// NOT SCHEDULED SURGERIES
-	//int length = SurgeriesNotScheduled.length();
-	//SurgeryInfo* GetSurgeries = new SurgeryInfo[length];
-	//SurgeriesNotScheduled.getAll(GetSurgeries, length);
-	//cout << "SURGERIES NOT SCHEDULED" << endl;
-	//cout << length << endl;
-	//for (int i = 0; i < length; i++)
-	//{
-	//	cout << GetSurgeries[i].getID() << " " << GetSurgeries[i].getSubSpecialty() << " " << GetSurgeries[i].getTime() << endl;
-	//}
-	//std::cin.get();
+	//PrintNotScheduled(SurgeriesNotScheduled);
+	
 
 
-	////UPPGIFT 2 MED PQ - MAX OCH MIN HEAP
+
+	//UPPGIFT 2 MED PQ - MAX OCH MIN HEAP
 	//readFromFile(aList,"Operationer_2.txt");
 	//cout << "\nFor how many days do you want to book the OR?" << endl; 
 	//int Days; 
@@ -83,7 +78,8 @@ int main()
 	//cin.ignore(); 
 
 	//AddToPQ(aList, PQ, Q);
-	//Uppgift2(roomArr, amountOfORs, PQ, SurgeriesNotScheduled,k,1);
+	//Uppgift2(roomArr, amountOfORs, PQ, SurgeriesNotScheduled,1);
+	//PrintNotScheduled(SurgeriesNotScheduled);
 	//for (int i = 0; i < Days - 1; i++)
 	//{
 	//	AddToPQ(SurgeriesNotScheduled, PQ, Q);
@@ -92,15 +88,16 @@ int main()
 	//		SurgeriesNotScheduled.removeAt(g);
 	//		g--;
 	//	}
-	//	Uppgift2(roomArr, amountOfORs, PQ, SurgeriesNotScheduled, k,i+1);
+	//	Uppgift2(roomArr, amountOfORs, PQ, SurgeriesNotScheduled,i+2);
+	//	PrintNotScheduled(SurgeriesNotScheduled);
 	//}
 	//	
-	//PrintNotScheduled(SurgeriesNotScheduled);
+	
 
 
 
-	//UPPGIFT 2 med STACK
-	readFromFile(aList, "Operationer_2.txt");
+	////UPPGIFT 2 med STACK
+	/*readFromFile(aList, "Operationer_2.txt");
 	cout << "\nFor how many days do you want to book the OR?" << endl;
 	int Days;
 	cin >> Days;
@@ -117,9 +114,9 @@ int main()
 			SurgeriesNotScheduled.removeAt(g);
 			g--;
 		}
-		Uppgift2Stack(roomArr, amountOfORs, Q, SurgeriesNotScheduled, i + 1);
+		Uppgift2Stack(roomArr, amountOfORs, Q, SurgeriesNotScheduled, i + 2);
 		PrintNotScheduled(SurgeriesNotScheduled);
-	}
+	}*/
 
 	
 
@@ -226,12 +223,11 @@ void Uppgift1Stack(OperatingRoom *&roomArr, int amountOfORs,  std::stack<helpStr
 
 	}
 
-	/*for (int i = 0; i < amountOfORs; i++)
+	for (int i = 0; i < amountOfORs; i++)
 	{
-		cout << i << " " << endl;
+		cout << "Operating Room " << i + 1 << endl;
 		roomArr[i].PrintSchedule();
-	}*/
-
+	}
 	delete [] roomArr;
 }
 void Uppgift1(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<helpStruct> &PQ, List<SurgeryInfo> &SurgeriesNotScheduled)
@@ -241,7 +237,6 @@ void Uppgift1(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<help
 	roomArr = new OperatingRoom[amountOfORs];
 	int time = 0;
 
-	//UPPGIFT 1
 	for (int i = 0; i < amountOfORs; i++)
 	{
 		roomArr[i].setTime(08.00, 19.00);
@@ -292,6 +287,12 @@ void Uppgift1(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<help
 	
 	}
 
+	for (int i = 0; i < amountOfORs; i++)
+	{
+		cout << "Operating Room " << i + 1 << endl;
+		roomArr[i].PrintSchedule();
+	}
+
 	delete[] roomArr;
 	
 }
@@ -301,17 +302,11 @@ void AddToPQ(List<SurgeryInfo> aList, std::priority_queue<helpStruct> &PQ, std::
 	int listLength = aList.length();
 	for (int i = 0; i < listLength; i++)
 	{
-
 		helpStruct addToPQ = { aList.getAt(i).getID(), aList.getAt(i).getSubSpecialty(), aList.getAt(i).getTime() };
 		Q.push(addToPQ);
 		PQ.push(addToPQ);
 
 	}
-	/*helpStruct highest = PQ.top();*/
-	// topInQueue = Q.front();
-	
-
-	//std::cout << highest.time << endl;
 }
 
 void Uppgift2(OperatingRoom *&roomArr, int amountOfORs, std::priority_queue<helpStruct> &PQ, List<SurgeryInfo> &SurgeriesNotScheduled, int day)
